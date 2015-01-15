@@ -5,7 +5,7 @@ This is a blunt stick to create a set of Atomic hosts in a Kubernetes cluster fr
 Right now, I've used this for testing in a local KVM (virt-manager) environment and in EC2.
 
 This is a high level (and poor) diagram of the components.
-!(network_diagram.png)
+![Diagram](network_diagram.png)
 
 ## To use this playbook:
 
