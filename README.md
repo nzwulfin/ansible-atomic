@@ -1,6 +1,8 @@
 # Creating an Atomic fleet using Ansible
 
-This is a blunt stick to create a set of Atomic hosts in a Kubernetes cluster from a Fedora 21 Server using Ansible.  Docker is configured to use Flannel for container networking.
+This is a blunt stick to create a set of Atomic hosts in a Kubernetes cluster from a Fedora 21 Server using Ansible.  Docker is configured to use Flannel for container networking.  I started with the eparis ansible kubernetes repo [https://github.com/eparis/kubernetes-ansible] as an example and there are some remnants of that code.  I expect to change / remove most of that in the near future.  
+
+Right now, I've used this for testing in a local KVM (virt-manager) environment and in EC2.
 
 ## To use this playbook:
 
