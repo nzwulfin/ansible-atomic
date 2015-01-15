@@ -1,0 +1,10 @@
+---
+- name: Make sure atomic tree is up to date
+  command: "atomic upgrade"
+  notify:
+          - reboot atomic
+
+- name: waiting for server to come back
+  local_action: wait_for host={{ inventory_hostname }}
+                state=started
+  sudo: false

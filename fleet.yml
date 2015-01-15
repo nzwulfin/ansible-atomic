@@ -1,0 +1,11 @@
+---
+- hosts: master
+  sudo: yes
+  roles:
+          - etcd
+          - master
+
+- hosts: minions
+  sudo: yes
+  roles:
+          - minion

@@ -1,0 +1,75 @@
+---
+- name: Update OS
+  when: RedHat any
+
+- name: Update Atomic tree
+  when: Atomic
+
+- name: install etcd
+  when: master
+
+- name: install kubernetes
+  when: master
+
+- name: main kubernetes config
+  template: 
+  when: master
+
+- name: kubernetes apiserver config
+  template:
+  when: master
+
+- name: kubernetes controller config
+  template:
+  when: master
+
+- name: enable etcd
+  when: master
+
+- name: add etcd port to firewall
+  when: master
+
+- name enable apiserver
+  template:
+  when: master
+
+- name: add apiserver port to firewall
+  when: master
+
+- name: enable controller
+  when: master
+
+- name: enable scheduler
+  when: master
+
+- name: push flannel config to etcd
+  template:
+  when: master
+
+- name: config flanneld
+  template:
+  when: minion
+
+- name: flannelize docker
+  template:
+  when: minion
+
+- name: configure kublet
+  template:
+  when: minion
+
+- name: main kubernetes config
+  template:
+  when: minion
+
+- name: enable flanneld
+  when: minion
+
+- name: enable docker
+  when: minion
+
+- name: enable kubelet
+  when: minion
+
+- name: enable kube-proxy
+  when: minion

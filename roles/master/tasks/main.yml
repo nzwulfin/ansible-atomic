@@ -1,0 +1,51 @@
+---
+- name: Determine if firewalld installed
+  command: "rpm -q firewalld"
+  register: has_firewalld
+  ignore_errors: yes
+  changed_when: false
+
+- name: Determine if iptables-services installed
+  command: "rpm -q iptables-services"
+  register: has_iptables
+  ignore_errors: yes
+  changed_when: false
+
+#- name: Make sure Fedora is up to date
+#  command: "yum -y update"
+#  notify:
+#          - reboot server
+#
+#- name: waiting for server to come back
+#  local_action: wait_for host={{ inventory_hostname }}
+#                state=started
+#  sudo: false
+- name: install kubernetes
+  yum: pkg=kubernetes state=latest
+  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+ 
+- name: write the main Kubernetes config file 
+  template: src=config.j2 dest=/etc/kubernetes/config
+
+- name: write the config files for apiserver
+  template: src=apiserver.j2 dest=/etc/kubernetes/apiserver
+
+- name: write the config file for controller-manager
+  template: src=controller-manager.j2 dest=/etc/kubernetes/controller-manager
+  notify:
+          - restart controller-manager
+
+- name: Enable apiserver
+  service: name=kube-apiserver enabled=yes state=started
+
+- name: Enable controller-manager
+  service: name=kube-controller-manager enabled=yes state=started
+
+- name: Enable scheduler
+  service: name=kube-scheduler enabled=yes state=started
+
+- include: firewalld.yml
+  when: has_firewalld.rc == 0
+
+- include: iptables.yml
+  when: has_firewalld.rc != 0 and has_iptables.rc == 0
