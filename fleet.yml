@@ -2,10 +2,14 @@
 - hosts: master
   sudo: yes
   roles:
-          - etcd
-          - master
+          - { role: etcd, tags: etcd }
+          - { role: master, tags: master }
 
 - hosts: minions
   sudo: yes
   roles:
-          - minion
+          - { role: minion, tags: minion }
+
+- hosts: master
+  roles:
+         - { role: kubedns, tags: kubedns }

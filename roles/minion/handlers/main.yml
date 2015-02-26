@@ -5,6 +5,9 @@
   poll: 0
   ignore_errors: true
 
+- name: reload systemd
+  command: systemctl daemon-reload
+
 - name: restart flannel
   service: name=flanneld state=restarted
 

@@ -11,15 +11,30 @@
   ignore_errors: yes
   changed_when: false
 
-#- name: Make sure Fedora is up to date
-#  command: "yum -y update"
-#  notify:
-#          - reboot server
-#
-#- name: waiting for server to come back
-#  local_action: wait_for host={{ inventory_hostname }}
-#                state=started
-#  sudo: false
+- name: Make sure Fedora is up to date
+  command: "yum -y update"
+  notify:
+          - reboot server
+
+- name: waiting for server to come back
+  local_action: wait_for host={{ inventory_hostname }}
+                state=started
+  sudo: false
+
+- name: Enable docker service
+  service: name=docker enabled=yes state=started
+
+- name: Create local mirror registry container
+  docker: image=registry name=local-registry ports=5000 volumes=/var/lib/local-registry:/srv/registry env="STANDALONE=false,MIRROR_SOURCE=https://registry-1.docker.io,MIRROR_SOURCE_INDEX=https://index.docker.io,STORAGE_PATH=/srv/registry"
+
+- name: Create local-registry service unit
+  copy: src=local-registry.service dest=/etc/systemd/system/local-registry.service
+  notify:
+    - reload systemd
+
+- name: Enable local-registry service
+  service: name=local-registry enabled=yes state=started
+
 - name: install kubernetes
   yum: pkg=kubernetes state=latest
   when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
