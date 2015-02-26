@@ -11,6 +11,9 @@
   ignore_errors: yes
   changed_when: false
 
+- name: Install correct resolv.conf
+  copy: src=resolv.conf dest=/etc/resolv.conf
+
 - name: Make sure atomic tree is up to date
   command: "atomic upgrade"
 
@@ -28,8 +31,13 @@
 - name: Install Flannel config file
   template: src=flanneld.j2 dest=/etc/sysconfig/flanneld
 
-- name: Install flannel enabled docker.service file
-  copy: src=docker.service dest=/etc/systemd/system/
+- name: Create drop-in dir for docker service
+  command: mkdir -p /etc/systemd/system/docker.service.d/
+
+- name: Install flannel enabled docker.service drop-in file
+  copy: src=10-flanneld-network.conf dest=/etc/systemd/system/docker.service.d/
+  notify:
+    - reload systemd
 
 - name: write the main Kubernetes config files
   template: src=config.j2 dest=/etc/kubernetes/config

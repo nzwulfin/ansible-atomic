@@ -1,3 +1,7 @@
 ansible_ssh_user: fedora
+ansible_ssh_pass: redhat
+ansible_sudo_pass: redhat
 flanneld_subnet: 172.16.0.0/12
 kube_service_addresses: 10.254.0.0/16
+cluster_name: atomic001
+cluster_dns_ip: 10.254.0.13
