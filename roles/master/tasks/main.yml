@@ -12,15 +12,11 @@
   changed_when: false
 
 - name: Generate SSH key
-  command: ssh-keygen -t rsa -C "fleet boss"
+  sudo: no
+  command: ssh-keygen -t rsa -C "fleet boss" -f /home/fedora/.ssh/id_rsa  -q -N ""
   tags:
     - prerun
-
-- name: Install SSH key
-  command: ssh-copy-id {{ item }}
-  with_items:  groups['minions']
-  tags:
-    - prerun
+    - ssh
 
 #- name: Make sure Fedora is up to date
 #  command: "yum -y update"
