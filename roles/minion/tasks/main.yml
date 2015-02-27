@@ -13,20 +13,35 @@
 
 - name: Install correct resolv.conf
   copy: src=resolv.conf dest=/etc/resolv.conf
+  tags:
+    - prerun
+
+- name: Grow root XFS filesystem
+  command: xfs_growfs /
+  tags:
+    - prerun
 
 - name: Make sure atomic tree is up to date
   command: "atomic upgrade"
+  tags:
+    - prerun
+
 
 - name: Enable new tree 
   command: systemctl reboot
   async: 0
   poll: 0
   ignore_errors: true
+  tags:
+    - prerun
 
 - name: waiting for minion to come back online
   local_action: wait_for host={{ inventory_hostname }}
                 state=started
   sudo: false
+  tags:
+    - prerun
+
 
 - name: Install Flannel config file
   template: src=flanneld.j2 dest=/etc/sysconfig/flanneld
@@ -56,6 +71,8 @@
 
 - name: Enable proxy
   service: name=kube-proxy enabled=yes state=started
+  notify:
+    - restart daemons
 
 - include: firewalld.yml
   when: has_firewalld.rc == 0

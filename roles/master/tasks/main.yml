@@ -48,7 +48,7 @@
 - name: write the config file for controller-manager
   template: src=controller-manager.j2 dest=/etc/kubernetes/controller-manager
   notify:
-          - restart controller-manager
+          - reload systemd
 
 - name: Enable apiserver
   service: name=kube-apiserver enabled=yes state=started
@@ -58,6 +58,8 @@
 
 - name: Enable scheduler
   service: name=kube-scheduler enabled=yes state=started
+  notify:
+    - restart daemons
 
 - include: firewalld.yml
   when: has_firewalld.rc == 0
