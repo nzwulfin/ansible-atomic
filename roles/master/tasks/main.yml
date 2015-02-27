@@ -11,6 +11,17 @@
   ignore_errors: yes
   changed_when: false
 
+- name: Generate SSH key
+  command: ssh-keygen -t rsa -C "fleet boss"
+  tags:
+    - prerun
+
+- name: Install SSH key
+  command: ssh-copy-id {{ item }}
+  with_items:  groups['minions']
+  tags:
+    - prerun
+
 #- name: Make sure Fedora is up to date
 #  command: "yum -y update"
 #  notify:
