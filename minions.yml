@@ -1,0 +1,8 @@
+---
+# Configure all kubernetes minions
+- hosts: minions
+  sudo: yes
+  roles:
+          - { role: minion, tags: minion }
+
+
