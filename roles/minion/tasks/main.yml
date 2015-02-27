@@ -60,6 +60,9 @@
   notify:
     - reload systemd
 
+- name: write the main Docker config files
+  template: src=docker.j2 dest=/etc/sysconfig/docker
+
 - name: write the main Kubernetes config files
   template: src=config.j2 dest=/etc/kubernetes/config
 
