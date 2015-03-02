@@ -3,3 +3,4 @@
 - include: master.yml
 - include: minions.yml
 - include: deploy_kdns.yml
+- include: deploy_guestbook.yml
