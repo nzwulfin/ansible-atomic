@@ -41,7 +41,7 @@
     - prerun
     - registry
 - name: Set up local docker options
-  template: source=docker.j2 dest=/etc/sysconfig/docker
+  template: src=docker.j2 dest=/etc/sysconfig/docker
   tags:
     - prerun
     - registry
