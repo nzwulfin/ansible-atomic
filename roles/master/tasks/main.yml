@@ -27,6 +27,24 @@
 #  local_action: wait_for host={{ inventory_hostname }}
 #                state=started
 #  sudo: false
+- name: Install docker from configured repo
+  yum: pkg=docker-io state=latest
+  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  tags:
+    - prerun
+    - registry
+
+- name: Install docker-py from configured repo
+  yum: pkg=python-docker-py state=latest
+  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  tags:
+    - prerun
+    - registry
+- name: Set up local docker options
+  config: source=docker.j2 dest=/etc/sysconfig/docker
+  tags:
+    - prerun
+    - registry
 
 - name: Enable docker service
   service: name=docker enabled=yes state=started
@@ -60,7 +78,20 @@
     - prerun
     - registry
 
-- name: install kubernetes
+- name: Cache local versions of needed Docker images
+  command: docker pull {{ item }}
+  with_items:
+    - quay.io/coreos/etcd:latest
+    - kubernetes/kube2sky:1.0
+    - kubernetes/skydns:2014-12-23-001
+    - kubernetes/example-guestbook-php-redis
+    - dockerfile/redis
+    - brendanburns/redis-slave
+  tags:
+    - prerun
+    - registry
+
+- name: Install kubernetes from configured repo
   yum: pkg=kubernetes state=latest
   when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
  

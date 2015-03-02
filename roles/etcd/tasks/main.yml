@@ -11,18 +11,6 @@
   ignore_errors: yes
   changed_when: false
 
-- name: Install docker from configured repo
-  yum: pkg=docker-io state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
-
-- name: Install docker-py from configured repo
-  yum: pkg=python-docker-py state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
-
-- name: Install kubernetes from configured repo
-  yum: pkg=kubernetes state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
-
 - name: Install etcd from configured repo
   yum: pkg=etcd state=latest
   when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
