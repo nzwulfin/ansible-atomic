@@ -14,7 +14,6 @@
 - name: Install correct authorized_key file
   authorized_key: user={{ ansible_ssh_user }} key="{{ lookup('file', '/home/fedora/.ssh/id_rsa.pub') }}"
   tags:
-    - prerun
     - ssh
 
 #- name: Install correct resolv.conf
