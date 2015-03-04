@@ -15,7 +15,6 @@
   sudo: no
   command: ssh-keygen -t rsa -C "fleet boss" -f /home/fedora/.ssh/id_rsa  -q -N ""
   tags:
-    - prerun
     - ssh
 
 #- name: Make sure Fedora is up to date

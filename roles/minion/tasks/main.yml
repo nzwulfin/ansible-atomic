@@ -17,18 +17,16 @@
     - prerun
     - ssh
 
-- name: Install correct resolv.conf
-  copy: src=resolv.conf dest=/etc/resolv.conf
-  tags:
-    - prerun
+#- name: Install correct resolv.conf
+#  copy: src=resolv.conf dest=/etc/resolv.conf
+#  tags:
+#    - prerun
 
 - name: Grow root XFS filesystem
   command: xfs_growfs /
-  tags:
-    - prerun
 
 - name: Make sure atomic tree is up to date
-  command: "atomic upgrade"
+  command: "rpm-ostree upgrade"
   tags:
     - prerun
 
