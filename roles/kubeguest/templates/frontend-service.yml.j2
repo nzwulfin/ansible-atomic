@@ -1,0 +1,12 @@
+---
+id: frontend
+kind: Service
+apiVersion: v1beta1
+port: 80
+publicIPs:
+- '{{ groups[''minions''][2] }}'
+containerPort: http-server
+selector:
+  name: frontend
+labels:
+  name: frontend
