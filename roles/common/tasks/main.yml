@@ -1,27 +1,24 @@
 ---
-- name: Determine if Atomic
-  command: "test -f /run/ostree-booted"
-  register: is_atomic
-  ignore_errors: yes
-  changed_when: false
+- name: Check if booted as Atomic
+  stat: path=/run/ostree-booted
+  register: ostree
+
+- name: Set custom Atomic fact
+  set_fact: is_atomic='{{ ostree.stat.exists }}'
 
 - name: Determine if firewalld installed
   command: "rpm -q firewalld"
-  register: has_firewalld
+  register: firewalld
   ignore_errors: yes
-  changed_when: false
+
+- name: Set custom firewalld fact
+  set_fact: has_firewalld='{{ firewalld.rc }}'
 
 - name: Determine if iptables-services installed
   command: "rpm -q iptables-services"
-  register: has_iptables
+  register: iptables
   ignore_errors: yes
-  changed_when: false
 
-- name: Update to latest OS
-
-- name: Update to lastest Atomic tree
-
-- name: Install the required master software
-
-- name: Set up repo files
+- name: Set custom Atomic fact
+  set_fact: has_iptables='{{ iptables.rc }}'
 

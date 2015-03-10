@@ -1,31 +1,16 @@
 ---
-- name: Determine if firewalld installed
-  command: "rpm -q firewalld"
-  register: has_firewalld
-  ignore_errors: yes
-  changed_when: false
-
-- name: Determine if iptables-services installed
-  command: "rpm -q iptables-services"
-  register: has_iptables
-  ignore_errors: yes
-  changed_when: false
-
 - name: Install correct authorized_key file
   authorized_key: user={{ ansible_ssh_user }} key="{{ lookup('file', '/home/fedora/.ssh/id_rsa.pub') }}"
   tags:
     - ssh
 
-#- name: Install correct resolv.conf
-#  copy: src=resolv.conf dest=/etc/resolv.conf
-#  tags:
-#    - prerun
-
 - name: Grow root XFS filesystem
   command: xfs_growfs /
+  when: is_atomic == True
 
 - name: Make sure atomic tree is up to date
   command: "rpm-ostree upgrade"
+  when: is_atomic == True
   tags:
     - prerun
 
@@ -81,8 +66,8 @@
     - restart daemons
 
 - include: firewalld.yml
-  when: has_firewalld.rc == 0
+  when: has_firewalld == True
 
 - include: iptables.yml
-  when: has_firewalld.rc != 0 and has_iptables.rc == 0
+  when: has_firewalld == True
 

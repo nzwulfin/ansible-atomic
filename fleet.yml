@@ -1,5 +1,6 @@
 ---
 # Configure the Atomic fleet
+- include: common.yml
 - include: master.yml
 - include: minions.yml
 - include: deploy_kdns.yml

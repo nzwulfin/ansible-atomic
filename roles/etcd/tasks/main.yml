@@ -1,28 +1,16 @@
 ---
-- name: Determine if firewalld installed
-  command: "rpm -q firewalld"
-  register: has_firewalld
-  ignore_errors: yes
-  changed_when: false
-
-- name: Determine if iptables-services installed
-  command: "rpm -q iptables-services"
-  register: has_iptables
-  ignore_errors: yes
-  changed_when: false
-
 - name: Install etcd from configured repo
   yum: pkg=etcd state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  when: ansible_os_family == "RedHat" and is_atomic == False
 
 - name: Enable and start etcd
   service: name=etcd enabled=yes state=started
 
 - include: firewalld.yml
-  when: has_firewalld.rc == 0
+  when: has_firewalld == True
 
 - include: iptables.yml
-  when: has_firewalld.rc != 0 and has_iptables.rc == 0
+  when: has_iptables == True
 
 - name: Create flanneld config
   template: src=flanneld-conf.json.j2 dest=/tmp/flanneld-conf.json

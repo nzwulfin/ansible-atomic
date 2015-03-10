@@ -1,19 +1,12 @@
 ---
-- name: Determine if firewalld installed
-  command: "rpm -q firewalld"
-  register: has_firewalld
-  ignore_errors: yes
-  changed_when: false
-
-- name: Determine if iptables-services installed
-  command: "rpm -q iptables-services"
-  register: has_iptables
-  ignore_errors: yes
-  changed_when: false
+- name: Check for existing SSH key
+  stat: path=/home/fedora/.ssh/id_rsa 
+  register: ssh_key
 
 - name: Generate SSH key
   sudo: no
   command: ssh-keygen -t rsa -C "fleet boss" -f /home/fedora/.ssh/id_rsa  -q -N ""
+  when: ssh_key.stat.exists == False
   tags:
     - ssh
 
@@ -26,19 +19,21 @@
 #  local_action: wait_for host={{ inventory_hostname }}
 #                state=started
 #  sudo: false
+
 - name: Install docker from configured repo
   yum: pkg=docker-io state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  when: ansible_os_family == "RedHat" and is_atomic == False
   tags:
     - prerun
     - registry
 
 - name: Install docker-py from configured repo
   yum: pkg=python-docker-py state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  when: ansible_os_family == "RedHat" and is_atomic == False
   tags:
     - prerun
     - registry
+
 - name: Set up local docker options
   template: src=docker.j2 dest=/etc/sysconfig/docker
   tags:
@@ -92,7 +87,7 @@
 
 - name: Install kubernetes from configured repo
   yum: pkg=kubernetes state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  when: ansible_os_family == "RedHat" and is_atomic == False
  
 - name: write the main Kubernetes config file 
   template: src=config.j2 dest=/etc/kubernetes/config
@@ -117,7 +112,7 @@
     - restart daemons
 
 - include: firewalld.yml
-  when: has_firewalld.rc == 0
+  when: has_firewalld == True
 
 - include: iptables.yml
-  when: has_firewalld.rc != 0 and has_iptables.rc == 0
+  when: has_iptables == True
