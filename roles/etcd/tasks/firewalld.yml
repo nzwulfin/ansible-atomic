@@ -7,5 +7,6 @@
 
 - name: Save firewalld port for etcd
   firewalld: port={{ item }}/tcp permanent=true state=enabled
+  with_items:
     - 4001
     - 7001
