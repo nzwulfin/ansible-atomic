@@ -7,10 +7,10 @@
   service: name=etcd enabled=yes state=started
 
 - include: firewalld.yml
-  when: has_firewalld == True
+  when: has_firewalld == '0'
 
 - include: iptables.yml
-  when: has_iptables == True
+  when: has_iptables == '0'
 
 - name: Create flanneld config
   template: src=flanneld-conf.json.j2 dest=/tmp/flanneld-conf.json

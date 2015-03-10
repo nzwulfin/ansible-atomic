@@ -112,7 +112,7 @@
     - restart daemons
 
 - include: firewalld.yml
-  when: has_firewalld == True
+  when: has_firewalld == '0'
 
 - include: iptables.yml
-  when: has_iptables == True
+  when: has_iptables == '0'
