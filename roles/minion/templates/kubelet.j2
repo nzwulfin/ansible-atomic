@@ -11,4 +11,4 @@ KUBELET_PORT="--port=10250"
 KUBELET_HOSTNAME="--hostname_override={{ ansible_default_ipv4.address }}"
 
 # Add your own!
-KUBELET_ARGS=" --cluster-dns={{cluster_dns_ip }} --cluster-domain={{ cluster_name }}"
+KUBELET_ARGS=" --cluster_dns={{cluster_dns_ip }} --cluster_domain={{ cluster_name }}"
