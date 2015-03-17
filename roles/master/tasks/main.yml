@@ -1,15 +1,18 @@
 ---
-- name: Determine if firewalld installed
-  command: "rpm -q firewalld"
-  register: has_firewalld
-  ignore_errors: yes
-  changed_when: false
+- name: Check for existing SSH key
+  stat: path=/home/fedora/.ssh/id_rsa 
+  register: ssh_key
+  tags:
+    - prerun
+    - ssh
 
-- name: Determine if iptables-services installed
-  command: "rpm -q iptables-services"
-  register: has_iptables
-  ignore_errors: yes
-  changed_when: false
+- name: Generate SSH key
+  sudo: no
+  command: ssh-keygen -t rsa -C "fleet boss" -f /home/fedora/.ssh/id_rsa  -q -N ""
+  when: ssh_key.stat.exists == False
+  tags:
+    - prerun
+    - ssh
 
 - name: Make sure Fedora is up to date
   command: "yum -y update"
@@ -23,21 +26,84 @@
 
 - name: Enable docker service
   service: name=docker enabled=yes state=started
+  tags:
+    - prerun
+    - registry
 
 - name: Create local mirror registry container
   docker: image=registry name=local-registry ports=5000 volumes=/var/lib/local-registry:/srv/registry env="STANDALONE=false,MIRROR_SOURCE=https://registry-1.docker.io,MIRROR_SOURCE_INDEX=https://index.docker.io,STORAGE_PATH=/srv/registry"
+  tags:
+    - prerun
+    - registry
+
+- name: Install docker from configured repo
+  yum: pkg=docker-io state=latest
+  when: ansible_os_family == "RedHat" and is_atomic == False
+  tags:
+    - prerun
+    - registry
+
+- name: Install docker-py from configured repo
+  yum: pkg=python-docker-py state=latest
+  when: ansible_os_family == "RedHat" and is_atomic == False
+  tags:
+    - prerun
+    - registry
+
+- name: Set up local docker options
+  template: src=docker.j2 dest=/etc/sysconfig/docker
+  tags:
+    - prerun
+    - registry
+
+- name: Enable docker service
+  service: name=docker enabled=yes state=started
+  tags:
+    - prerun
+    - registry
+
+- name: Create local mirror registry container
+  docker: image=registry name=local-registry ports=5000:5000 volumes=/var/lib/local-registry:/srv/registry env="STANDALONE=false,MIRROR_SOURCE=https://registry-1.docker.io,MIRROR_SOURCE_INDEX=https://index.docker.io,STORAGE_PATH=/srv/registry"
+  tags:
+    - prerun
+    - registry
+
+- name: Change SELinux context for registry storage path
+  command: chcon -Rvt svirt_sandbox_file_t /var/lib/local-registry
+  tags:
+    - prerun
+    - registry
 
 - name: Create local-registry service unit
   copy: src=local-registry.service dest=/etc/systemd/system/local-registry.service
   notify:
     - reload systemd
+  tags:
+    - prerun
+    - registry
 
 - name: Enable local-registry service
   service: name=local-registry enabled=yes state=started
+  tags:
+    - prerun
+    - registry
 
-- name: install kubernetes
+- name: Cache local versions of needed Docker images
+  command: docker pull {{ item }}
+  with_items:
+    - quay.io/coreos/etcd:latest
+    - kubernetes/kube2sky:1.0
+    - kubernetes/skydns:2014-12-23-001
+    - kubernetes/example-guestbook-php-redis
+    - dockerfile/redis
+    - brendanburns/redis-slave
+  tags:
+    - prerun
+    - registry
+
+- name: Install kubernetes from configured repo
   yum: pkg=kubernetes state=latest
-  when: ansible_os_family == "RedHat" #and is_atomic.rc == 1
+  when: ansible_os_family == "RedHat" and is_atomic == False
  
 - name: write the main Kubernetes config file 
   template: src=config.j2 dest=/etc/kubernetes/config
@@ -48,7 +114,7 @@
 - name: write the config file for controller-manager
   template: src=controller-manager.j2 dest=/etc/kubernetes/controller-manager
   notify:
-          - restart controller-manager
+          - reload systemd
 
 - name: Enable apiserver
   service: name=kube-apiserver enabled=yes state=started
@@ -58,9 +124,11 @@
 
 - name: Enable scheduler
   service: name=kube-scheduler enabled=yes state=started
+  notify:
+    - restart daemons
 
 - include: firewalld.yml
-  when: has_firewalld.rc == 0
+  when: has_firewalld == '0'
 
 - include: iptables.yml
-  when: has_firewalld.rc != 0 and has_iptables.rc == 0
+  when: has_iptables == '0'

@@ -1,0 +1,8 @@
+---
+# Configure the etcd and kubernetes master host
+- hosts: master
+  sudo: yes
+  roles:
+          - { role: etcd, tags: etcd }
+          - { role: master, tags: master }
+

@@ -1,15 +1,7 @@
 ---
-- hosts: master
-  sudo: yes
-  roles:
-          - { role: etcd, tags: etcd }
-          - { role: master, tags: master }
-
-- hosts: minions
-  sudo: yes
-  roles:
-          - { role: minion, tags: minion }
-
-- hosts: master
-  roles:
-         - { role: kubedns, tags: kubedns }
+# Configure the Atomic fleet
+- include: common.yml
+- include: master.yml
+- include: minions.yml
+- include: deploy_kdns.yml
+- include: deploy_guestbook.yml

@@ -5,6 +5,14 @@
   poll: 0
   ignore_errors: true
 
+- name: restart daemons
+  command: /bin/true
+  notify:
+          - restart flannel
+          - restart docker
+          - restart kubelet
+          - restart proxy
+
 - name: reload systemd
   command: systemctl daemon-reload
 
@@ -14,8 +22,8 @@
 - name: restart docker
   service: name=docker state=restarted
 
-- name: restart kublet
-  service: name=kubelet
+- name: restart kubelet
+  service: name=kubelet state=restarted
 
 - name: restart proxy
   service: name=kube-proxy state=restarted

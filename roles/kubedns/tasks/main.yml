@@ -2,13 +2,13 @@
   command: mkdir -p kubedns
 
 - name: Create SkyDNS service file
-  template: src=skydns-svc.yaml.j2 dest=kubedns/skydns-svc.yaml
+  template: src=skydns-svc.yml.j2 dest=kubedns/skydns-svc.yml
 
 - name: Create SkyDNS controller file
-  template: src=skydns-controller.yaml.j2 dest=kubedns/skydns-controller.yaml
+  template: src=skydns-controller.yml.j2 dest=kubedns/skydns-controller.yml
 
 - name: Create SkyDNS service
-  command: kubectl create -f kubedns/skydns-svc.yaml 
+  command: kubectl create -f kubedns/skydns-svc.yml 
 
 - name: Create SkyDNS replication controller
-  command: kubectl create -f kubedns/skydns-controller.yaml 
+  command: kubectl create -f kubedns/skydns-controller.yml 

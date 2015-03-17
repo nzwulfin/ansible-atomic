@@ -1,29 +1,35 @@
 ---
-- name: Determine if firewalld installed
-  command: "rpm -q firewalld"
-  register: has_firewalld
-  ignore_errors: yes
-  changed_when: false
+- name: Install correct authorized_key file
+  authorized_key: user={{ ansible_ssh_user }} key="{{ lookup('file', '/home/fedora/.ssh/id_rsa.pub') }}"
+  tags:
+    - ssh
 
-- name: Determine if iptables-services installed
-  command: "rpm -q iptables-services"
-  register: has_iptables
-  ignore_errors: yes
-  changed_when: false
+- name: Grow root XFS filesystem
+  command: xfs_growfs /
+  when: is_atomic == True
 
 - name: Make sure atomic tree is up to date
-  command: "atomic upgrade"
+  command: "rpm-ostree upgrade"
+  when: is_atomic == True
+  tags:
+    - prerun
+
 
 - name: Enable new tree 
   command: systemctl reboot
   async: 0
   poll: 0
   ignore_errors: true
+  tags:
+    - prerun
 
 - name: waiting for minion to come back online
   local_action: wait_for host={{ inventory_hostname }}
                 state=started
   sudo: false
+  tags:
+    - prerun
+
 
 - name: Install Flannel config file
   template: src=flanneld.j2 dest=/etc/sysconfig/flanneld
@@ -35,6 +41,9 @@
   copy: src=10-flanneld-network.conf dest=/etc/systemd/system/docker.service.d/
   notify:
     - reload systemd
+
+- name: write the main Docker config files
+  template: src=docker.j2 dest=/etc/sysconfig/docker
 
 - name: write the main Kubernetes config files
   template: src=config.j2 dest=/etc/kubernetes/config
@@ -53,10 +62,12 @@
 
 - name: Enable proxy
   service: name=kube-proxy enabled=yes state=started
+  notify:
+    - restart daemons
 
 - include: firewalld.yml
-  when: has_firewalld.rc == 0
+  when: has_firewalld == '0'
 
 - include: iptables.yml
-  when: has_firewalld.rc != 0 and has_iptables.rc == 0
+  when: has_firewalld == '0'
 

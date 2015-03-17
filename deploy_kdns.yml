@@ -1,0 +1,6 @@
+---
+# Deploy the kubernetes dns pod
+- hosts: master
+  roles:
+         - { role: kubedns, tags: kubedns }
+

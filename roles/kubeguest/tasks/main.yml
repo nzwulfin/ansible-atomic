@@ -1,0 +1,36 @@
+- name: Create kubeguest directory
+  command: mkdir -p kubeguest
+
+- name: Create frontend service file with public IP
+  template: src={{ item }}.yml.j2 dest=kubeguest/{{ item }}.yml
+  with_items:
+    - frontend-service
+
+- name: Copy service and controllers
+  copy: src={{ item }}.yml dest=kubeguest/{{ item }}.yml
+  with_items:
+  - frontend-controller
+  - redis-master-controller
+  - redis-master-service
+  - redis-slave-controller
+  - redis-slave-service
+
+- name: Create Redis master controller
+  command: kubectl create -f kubeguest/redis-master-controller.yml
+
+- name: Create Redis master service
+  command: kubectl create -f kubeguest/redis-master-service.yml
+
+- name: Create Redis slave controller
+  command: kubectl create -f kubeguest/redis-slave-controller.yml
+
+- name: Create Redis slave service
+  command: kubectl create -f kubeguest/redis-slave-service.yml
+
+- name: Create PHP frontend controller 
+  command: kubectl create -f kubeguest/frontend-controller.yml
+
+- name: Create PHP frontend service
+  command: kubectl create -f kubeguest/frontend-service.yml
+
+

@@ -1,0 +1,6 @@
+---
+# Deploy the kubernetes guestbook example pod
+- hosts: master
+  roles:
+         - { role: kubeguest, tags: kubeguest }
+
