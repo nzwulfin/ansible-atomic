@@ -24,18 +24,6 @@
                 state=started
   sudo: false
 
-- name: Enable docker service
-  service: name=docker enabled=yes state=started
-  tags:
-    - prerun
-    - registry
-
-- name: Create local mirror registry container
-  docker: image=registry name=local-registry ports=5000 volumes=/var/lib/local-registry:/srv/registry env="STANDALONE=false,MIRROR_SOURCE=https://registry-1.docker.io,MIRROR_SOURCE_INDEX=https://index.docker.io,STORAGE_PATH=/srv/registry"
-  tags:
-    - prerun
-    - registry
-
 - name: Install docker from configured repo
   yum: pkg=docker-io state=latest
   when: ansible_os_family == "RedHat" and is_atomic == False
