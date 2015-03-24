@@ -19,4 +19,5 @@
   template: src=flanneld-conf.json.j2 dest=/tmp/flanneld-conf.json
 
 - name: POST the config to etcd
-  shell: curl -L http://{{ groups['etcd'][0] }}:4001/v2/keys/{{ cluster_name }}/network/config -XPUT --data-urlencode value@/tmp/flanneld-conf.json
+  uri: url=http{{ group(etcd)[0] }}:4001/v2/keys/{{ cluster_name }}/network/config method=POST body="{{ lookup('template', 'flanneld-conf.json.j2' }}
+  #shell: curl -L http://{{ groups['etcd'][0] }}:4001/v2/keys/{{ cluster_name }}/network/config -XPUT --data-urlencode value@/tmp/flanneld-conf.json
