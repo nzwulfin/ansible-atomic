@@ -3,6 +3,9 @@
   yum: pkg=etcd state=latest
   when: ansible_os_family == "RedHat" and is_atomic == False
 
+- name: Create etcd config
+  template: src=etcd.conf.j2 dest=/etc/etcd/etcd.conf
+
 - name: Enable and start etcd
   service: name=etcd enabled=yes state=started
 
