@@ -15,9 +15,13 @@ This is a high level (and poor) diagram of the components.
 * Update the group_vars/master.yml and minions.tml to reflect any needed changes
 * Run 'ansible -i inventory all -m ping' to make sure ansible can ssh to all the systems
 * Run the toplevel fleet.yml playbook
-** ansible-playbook -i inventory fleet.yml --tags ssh -k (Deploy ssh keys, will ask for ssh password)
-** ansible-playbook -i inventory fleet.yml --tags prerun,common (Run common and setup tasks tagged with prerun)
-** ansible-playbook -i inventory fleet.yml --skip-tags prerun,ssh (Run everything but the setup and ssh tasks, add kubeguest,kubedns to the skip list to not deploy those pods)
+    * ansible-playbook -i inventory fleet.yml --tags ssh -k 
+    Deploy ssh keys, will ask for ssh password
+    * ansible-playbook -i inventory fleet.yml --tags prerun,common 
+    Run common and setup tasks tagged with prerun
+    * ansible-playbook -i inventory fleet.yml --skip-tags prerun,ssh 
+    Run everything but the setup and ssh tasks
+    add kubeguest,kubedns to the skip list to not deploy those pods
 * Run 'kubectl get minions'
 * ???
 * Profit!
