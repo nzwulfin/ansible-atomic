@@ -14,15 +14,15 @@
     - prerun
     - ssh
 
-- name: Make sure Fedora is up to date
-  command: "yum -y update"
-  notify:
-          - reboot server
-
-- name: waiting for server to come back
-  local_action: wait_for host={{ inventory_hostname }}
-                state=started
-  sudo: false
+#- name: Make sure Fedora is up to date
+#  command: "yum -y update"
+#  notify:
+#          - reboot server
+#
+#- name: waiting for server to come back
+#  local_action: wait_for host={{ inventory_hostname }}
+#                state=started
+#  sudo: false
 
 - name: Install docker from configured repo
   yum: pkg=docker-io state=latest
