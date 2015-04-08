@@ -13,6 +13,9 @@
 # Comma seperated list of nodes in the etcd cluster
 KUBE_ETCD_SERVERS="--etcd_servers=http://{{ groups['master'][0] }}:4001"
 
+# Used by controller-manager and scheduler to talk to apiserver
+KUBE_MASTER="--master=http://{{ groups['master'][0] }}:8080"
+
 # logging to stderr means we get it in the systemd journal
 KUBE_LOGTOSTDERR="--logtostderr=true"
 

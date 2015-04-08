@@ -3,22 +3,25 @@
   stat: path=/run/ostree-booted
   register: ostree
 
-- name: Set custom Atomic fact
-  set_fact: is_atomic='{{ ostree.stat.exists }}'
+- name: Set custom facts
+  set_fact: 
+    is_atomic='{{ ostree.stat.exists }}'
 
 - name: Determine if firewalld installed
   command: "rpm -q firewalld"
   register: firewalld
   ignore_errors: yes
 
-- name: Set custom firewalld fact
-  set_fact: has_firewalld='{{ firewalld.rc }}'
+- name: Set custom fact firewalld true
+  set_fact:
+    has_firewalld: '{{ firewalld.rc }}'
 
 - name: Determine if iptables-services installed
   command: "rpm -q iptables-services"
   register: iptables
   ignore_errors: yes
 
-- name: Set custom Atomic fact
-  set_fact: has_iptables='{{ iptables.rc }}'
+- name: Set custom fact iptables true
+  set_fact: 
+    has_iptables: '{{ iptables.rc }}'
 
