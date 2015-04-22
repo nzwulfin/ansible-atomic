@@ -20,20 +20,20 @@ desiredState:
         dnsPolicy: "Default"  # Don't use cluster DNS.
         containers:
           - name: etcd
-            image: quay.io/coreos/etcd:latest
+            image: quay.io/coreos/etcd
             command: [
                     "/etcd",
                     "-bind-addr=127.0.0.1",
                     "-peer-bind-addr=127.0.0.1",
             ]
           - name: kube2sky
-            image: kubernetes/kube2sky:1.0
+            image: kubernetes/kube2sky
             command: [
                     # entrypoint = "/kube2sky",
                     "-domain={{ cluster_name }}.local",
             ]
           - name: skydns
-            image: kubernetes/skydns:2014-12-23-001
+            image: kubernetes/skydns
             command: [
                     # entrypoint = "/skydns",
                     "-machines=http://localhost:4001",
